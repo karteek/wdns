@@ -19,10 +19,11 @@ import (
 )
 
 var (
-	domain   string
-	client   *dns.Client
-	memCache *cache.Cache
-	verbose  bool
+	domain     string
+	client     *dns.Client
+	memCache   *cache.Cache
+	nameserver string
+	verbose    bool
 )
 
 // Question type
@@ -67,7 +68,7 @@ func handleRequest(w dns.ResponseWriter, r *dns.Msg) {
 				}
 			}
 		} else {
-			res, _, err := client.Exchange(r, "8.8.8.8:53")
+			res, _, err := client.Exchange(r, nameserver)
 			if err != nil {
 				log.Printf("Error resolving %s", q.Name)
 			} else {
@@ -93,6 +94,7 @@ func main() {
 	port := flag.Int("port", 8053, "port to run on")
 	flag.BoolVar(&verbose, "verbose", false, "run in verbose mode")
 	flag.StringVar(&domain, "domain", "int.example.com", "Domain to support wildcard DNS")
+	flag.StringVar(&nameserver, "nameserver", "8.8.8.8:53", "Nameserver to relay requests")
 	flag.Parse()
 
 	domain = domain + "."
